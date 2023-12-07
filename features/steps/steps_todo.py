@@ -20,12 +20,23 @@ LOGGER = get_logger(__name__, logging.DEBUG)
 
 @given('I set the base url and headers')
 def step_set_base_url(context):
+    """
+    Step to set the base url
+    :param context:
+    :return:
+    """
     LOGGER.debug("HEADERS: %s", context.headers)
     LOGGER.debug("URL: %s", context.url)
   
 
 @then('I receive a {status_code:d} status code in response')
 def step_verify_status_code(context, status_code):
+    """
+    Step to verify status code
+    :param context:
+    :param status_code:
+    :return:
+    """
     LOGGER.debug("Status code from response: %s", context.response["status"])
     LOGGER.debug("Status code param: %s", type(status_code))
     LOGGER.debug("Status code response: %s", type(context.response["status"]))
@@ -37,6 +48,14 @@ def step_verify_status_code(context, status_code):
 # @step(u'I call to projects endpoint using "(\\w*)" method( using the "([\\w\\s]*)" as parameter)*')
 @step('I call to {feature} endpoint using "{method_name}" method using the "{param}" as parameter')
 def step_call_endpoint(context, feature, method_name, param):
+    """
+    Step to call endpoint according to parameters send
+    :param context:
+    :param feature:
+    :param method_name:
+    :param param:
+    :return:
+    """
     # url base "https://api.todoist.com/rest/v2/" + feature .ie. projects, sections, tasks, etc.
     url = context.url + context.feature_name
     data = None
@@ -85,7 +104,9 @@ def step_impl(context, option, type_file):
     :param type_file:  str     option to define which json file will be used: simple or multiple
     :type context: behave.runner.Context
     """
-
+    # feature = context.feature_name
+    # if list == "all":
+    #     feature = f"{context.feature_name}_all"
     ValidateResponse().validate_response(actual_response=context.response,
                                          method=context.method.lower(),
                                          expected_status_code=context.status_code,
@@ -111,6 +132,19 @@ def get_url_by_feature(context):
     return url
 
 
+def get_dynamic_url(context, param):
+    """
+    Get the dynamic URL
+    :param context:
+    :param param:
+    :return:
+    """
+    url = context.url + context.feature_name + "?" + param + "=" + context.project_id
+    LOGGER.info("SdSSSSSSSSSSXXXXS")
+    LOGGER.info(url)
+    LOGGER.info("SdSSSSSSSSSSSSSS")
+
+
 def append_to_resources_list(context, response):
     """
     Method to append resources to clean up lists
@@ -130,7 +164,7 @@ def append_to_resources_list(context, response):
     if context.feature_name == "tasks":
         context.task_list.append(response["body"]["id"])
 
-#context.resource_list["projects"].append(context.project_id)
+
 def get_data_by_feature(context):
     LOGGER.debug("JSON: %s", context.text)
     dictionary = json.loads(context.text)
@@ -159,7 +193,7 @@ def get_data_by_feature(context):
 
 
 @when("I want close the task")
-def step_impl(context):
+def step_close_task(context):
     """
     :type context: behave.runner.Context
     """
@@ -172,7 +206,7 @@ def step_impl(context):
 
 
 @then("I want to reopen the task")
-def step_impl(context):
+def step_reopen_task(context):
     """
     :type context: behave.runner.Context
     """
@@ -188,4 +222,4 @@ def step_impl(context):
                                                 headers=context.headers, url=url_reopen_task)
 
     context.response = response_reopen
-    context.method = "post"
+

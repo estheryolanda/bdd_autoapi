@@ -114,20 +114,27 @@ def after_scenario(context, scenario):
 
 
 def after_feature(context, feature):
-    print("After feature")
+    """
+    Method to execute instructions after feature
+    :param context:
+    :param feature:
+    :return:
+    """
+    LOGGER.debug("After feature")
+    delete_resources(context)
 
 
-def after_all(context):
-    LOGGER.debug("After all")
-    LOGGER.debug("Resources: %s", context.resource_list)
-    for resource in context.resource_list:
-        LOGGER.debug("Resource: %s", resource)
-        for r in context.resource_list[resource]:
-            # i.e https://api.todoist.com/rest/v2/ projects / project_id
-            url = f"{context.url}{resource}/{r}"
-            RestClient().send_request(method_name="delete", session=context.session,
-                                      url=url, headers=context.headers)
-            LOGGER.info("Deleting %s: %s", resource, r)
+# def after_all(context):
+#     LOGGER.debug("After all")
+#     LOGGER.debug("Resources: %s", context.resource_list)
+#     for resource in context.resource_list:
+#         LOGGER.debug("Resource: %s", resource)
+#         for r in context.resource_list[resource]:
+#             # i.e https://api.todoist.com/rest/v2/ projects / project_id
+#             url = f"{context.url}{resource}/{r}"
+#             RestClient().send_request(method_name="delete", session=context.session,
+#                                       url=url, headers=context.headers)
+#             LOGGER.info("Deleting %s: %s", resource, r)
 
 
 def create_project(context, name_project):
@@ -240,3 +247,17 @@ def create_comments(context, project_id=None, task_id=None):
         LOGGER.debug("Comment id created: %s", comment_id)
         context.resource_list["comments"].append(comment_id)
 
+
+def delete_resources(context):
+    """
+    Delete all resources
+    """
+    LOGGER.debug("Resources: %s", context.resource_list)
+    for resource in context.resource_list:
+        LOGGER.debug("Resource: %s", resource)
+        for res in context.resource_list[resource]:
+            # i.e https://api.todoist.com/rest/v2/ projects / project_id
+            url = f"{context.url}{resource}/{res}"
+            RestClient().send_request(method_name="delete", session=context.session,
+                                      url=url, headers=context.headers)
+            LOGGER.info("Deleting %s: %s", resource, res)
